@@ -24,11 +24,46 @@ typedef struct mound
     int count;
 } mound;
 
-int val(MNODE m)
+// returns the MNode value
+int val(MNODE n)
 {
-    return m->list->value;
+    if (n->c == 0)
+        return __INT_MAX__;
+    return n->list->value;
 }
 
+void insert(mound m, int value);
+mound *createNewMound()
+{
+    mound *m = (mound *)malloc(sizeof(mound));
+    m->count = 0;
+    m->root = NULL;
+    return m;
+}
+
+MNODE createNewMNode()
+{
+    MNODE n = (MNODE)malloc(sizeof(struct MNode));
+    n->c = 0;
+    n->dirty = false;
+    n->list = NULL;
+    n->left = NULL;
+    n->right = NULL;
+    return n;
+}
+
+LNODE createNewLNode(int val)
+{
+    LNODE l = (LNODE)malloc(sizeof(struct LNode));
+    l->next = NULL;
+    l->value = val;
+    return l;
+}
+
+void setMNodeDirty(MNODE n, bool newDirty)
+{
+    n->dirty = newDirty;
+}
 // LIST createNewList()
 // {
 //     LIST myList;
