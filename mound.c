@@ -98,11 +98,15 @@ void swapRight(MNODE n)
 
 void insert(MOUND m, int value);
 
-// moundify should take a mound checks all of it and moundifies
+// moundify should check children if dirty then first calls moundify on them;
 void moundify(MNODE n)
 {
     if (!checkDirty(n))
         return;
+
+    moundify(n->left);
+    moundify(n->right);
+
     (getMNodeValue(n->left) > getMNodeValue(n->right)) ? swapRight(n) : swapLeft(n);
     moundify(n->left);
     moundify(n->right);
