@@ -18,24 +18,25 @@ struct MNode
     MNODE left;
     MNODE right;
 };
-typedef struct mound
+typedef struct mound *MOUND;
+struct mound
 {
     MNODE root;
     int count;
-} mound;
+};
 
 // returns the MNode value
-int val(MNODE n)
+int getMNodeValue(MNODE n)
 {
     if (n->c == 0)
         return __INT_MAX__;
     return n->list->value;
 }
 
-void insert(mound m, int value);
-mound *createNewMound()
+void insert(MOUND m, int value);
+MOUND createNewMound()
 {
-    mound *m = (mound *)malloc(sizeof(mound));
+    MOUND m = (MOUND)malloc(sizeof(struct mound));
     m->count = 0;
     m->root = NULL;
     return m;
@@ -60,9 +61,63 @@ LNODE createNewLNode(int val)
     return l;
 }
 
+bool checkDirty(MNODE n)
+{
+    return n->dirty;
+}
+
 void setMNodeDirty(MNODE n, bool newDirty)
 {
     n->dirty = newDirty;
+}
+
+void swapLeft(MNODE n)
+{
+    LNODE temp = n->left->list;
+    n->left->list = n->list;
+    n->list = temp;
+    setMNodeDirty(n, false);
+    int val = getMNodeValue(n->left);
+    int left = getMNodeValue(n->left->left);
+    int right = getMNodeValue(n->left->right);
+    if (val > left || val > right)
+        setMNodeDirty(n->left, true);
+}
+void swapRight(MNODE n)
+{
+    LNODE temp = n->right->list;
+    n->right->list = n->list;
+    n->list = temp;
+    setMNodeDirty(n, false);
+    int val = getMNodeValue(n->right);
+    int left = getMNodeValue(n->right->left);
+    int right = getMNodeValue(n->right->right);
+    if (val > left || val > right)
+        setMNodeDirty(n->right, true);
+}
+
+void insert(MOUND m, int value);
+
+// moundify should take a mound checks all of it and moundifies
+void moundify(MNODE n)
+{
+    if (!checkDirty(n))
+        return;
+    (getMNodeValue(n->left) > getMNodeValue(n->right)) ? swapRight(n) : swapLeft(n);
+    moundify(n->left);
+    moundify(n->right);
+}
+
+int extractMin(MOUND m)
+{
+    int min = getMNodeValue(m->root); // first element of the root node is the minimum
+    LNODE temp;
+    temp = m->root->list;
+    m->root->list = m->root->list->next;
+    free(temp);
+    setMNodeDirty(m->root, true);
+    moundify(m);
+    return min;
 }
 // LIST createNewList()
 // {
