@@ -14,7 +14,7 @@ struct MNode
 {
     int c;
     bool dirty;
-    LNODE head;
+    LNODE list;
     MNODE left;
     MNODE right;
 };
@@ -23,6 +23,11 @@ typedef struct mound
     MNODE root;
     int count;
 } mound;
+
+int val(MNODE m)
+{
+    return m->list->value;
+}
 
 // LIST createNewList()
 // {
