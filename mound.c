@@ -122,3 +122,28 @@ int extractMin(MOUND m)
     moundify(m);
     return min;
 }
+
+void printLNodes(LNODE list)
+{
+    LNODE temp = list;
+    while (temp != NULL)
+    {
+        printf("%d ", temp);
+        temp = temp->next;
+    }
+    prnitf("\n");
+}
+
+void printInOrderMNode(MNODE n)
+{
+    if (n == NULL)
+        return;
+    printInOrderMNode(n->left);
+    printLNodes(n);
+    printInOrderMNode(n->right);
+}
+
+void printMound(MOUND m)
+{
+    printInOrderMNode(m->root);
+}
