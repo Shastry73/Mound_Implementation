@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <math.h>
+#include <time.h>
+#define MAX_CAPACITY 100
+#define THRESHOLD 10
+
+unsigned int numberOfNodes = 0;
 
 typedef struct LNode *LNODE;
 struct LNode
@@ -22,8 +28,55 @@ typedef struct mound *MOUND;
 struct mound
 {
     MNODE root;
-    int count;
+    MNODE indexes[MAX_CAPACITY];
 };
+
+struct MNode defaultMNode = {0, false, NULL, NULL, NULL};
+
+void intialiseMound(MOUND m)
+{
+    MNODE *indexes = m->indexes;
+    for (int i = 0; i <= MAX_CAPACITY; i++)
+    {
+        indexes[i]->c = 0;
+        indexes[i]->dirty = false;
+        indexes[i]->list = NULL;
+        indexes[i]->left = NULL;
+        indexes[i]->right = NULL;
+    }
+    for (int i = 1; i <= (MAX_CAPACITY - 1) / 2; i++)
+    {
+        indexes[i - 1]->left = indexes[(i * 2) - 1];
+        indexes[i - 1]->right = indexes[(i * 2)];
+    }
+}
+
+int randiom(int lower, int upper)
+{
+    int num = (rand() % (upper - lower + 1)) + lower;
+    return num;
+}
+
+int binary_search(int arr[], int left, int right, int x)
+{
+    while (left <= right)
+    {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] == x)
+        {
+            return mid;
+        }
+        else if (arr[mid] < x)
+        {
+            left = mid + 1;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+    return -1;
+}
 
 // returns the MNode value
 int getMNodeValue(MNODE n)
@@ -33,11 +86,9 @@ int getMNodeValue(MNODE n)
     return n->list->value;
 }
 
-void insert(MOUND m, int value);
 MOUND createNewMound()
 {
     MOUND m = (MOUND)malloc(sizeof(struct mound));
-    m->count = 0;
     m->root = NULL;
     return m;
 }
@@ -96,7 +147,47 @@ void swapRight(MNODE n)
         setMNodeDirty(n->right, true);
 }
 
-void insert(MOUND m, int value);
+void insert(MOUND m, int value)
+{
+    MNODE *indexes = m->indexes;
+    MNODE child = createNewMNode();
+    MNODE parent = createNewMNode();
+    int i = 0;
+    while (getMNodeValue(child) == __INT_MAX__ && i < THRESHOLD)
+    {
+        unsigned int x = randiom((int)numberOfNodes, MAX_CAPACITY); // select randomly between numberOfNodes and MAX_CAPACITY
+        unsigned int intitial = x;
+        int intialPower = (int)log2(intitial);
+        child = indexes[x];
+        parent = indexes[x / 2];
+        while ((value <= getMNodeValue(child) && value > getMNodeValue(parent)) || x == 1)
+        {
+            // binary search of x;
+            int power = (int)log2(x);
+            if (value <= getMNodeValue(child))
+            {
+                power /= 2;
+                int divideBy = pow(2, power);
+                x /= divideBy;
+            }
+            else
+            {
+                power = power + (power / 2);
+                int powerMult = intialPower - power;
+                int divideBy = pow(2, power);
+                x = intitial / divideBy;
+            }
+            child = indexes[x];
+            parent = indexes[x / 2];
+        }
+        i++;
+    }
+    LNODE temp = createNewLNode(value);
+    if (child->list == NULL)
+        numberOfNodes++;
+    temp->next = child->list;
+    child->list = temp;
+}
 
 void moundify(MNODE n)
 {
@@ -118,7 +209,11 @@ int extractMin(MOUND m)
     temp = m->root->list;
     m->root->list = m->root->list->next;
     free(temp);
-    setMNodeDirty(m->root, true);
+    int val = getMNodeValue(m->root);
+    int left = getMNodeValue(m->root->left);
+    int right = getMNodeValue(m->root->right);
+    if (val > left || val > right)
+        setMNodeDirty(m->root, true);
     moundify(m);
     return min;
 }
@@ -128,10 +223,10 @@ void printLNodes(LNODE list)
     LNODE temp = list;
     while (temp != NULL)
     {
-        printf("%d ", temp);
+        printf("%d ", temp->value);
         temp = temp->next;
     }
-    prnitf("\n");
+    printf("\n");
 }
 
 void printInOrderMNode(MNODE n)
@@ -146,4 +241,14 @@ void printInOrderMNode(MNODE n)
 void printMound(MOUND m)
 {
     printInOrderMNode(m->root);
+}
+
+int main(int argc, char const *argv[])
+{
+    srand(time(0));
+    MOUND M = createNewMound();
+    intialiseMound(M);
+    // insert(M, 13);
+    // printMound(M);
+    return 0;
 }
