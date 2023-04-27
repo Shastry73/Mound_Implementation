@@ -4,8 +4,9 @@
 #include <stdbool.h>
 #include <math.h>
 #include <time.h>
+#define INT_MAX 2147483647
 #define MAX_CAPACITY 100
-#define THRESHOLD 10
+#define THRESHOLD 1
 
 unsigned int numberOfNodes = 0;
 
@@ -28,28 +29,10 @@ typedef struct mound *MOUND;
 struct mound
 {
     MNODE root;
-    MNODE indexes[MAX_CAPACITY];
+    MNODE *indexes;
 };
 
 struct MNode defaultMNode = {0, false, NULL, NULL, NULL};
-
-void intialiseMound(MOUND m)
-{
-    MNODE *indexes = m->indexes;
-    for (int i = 0; i <= MAX_CAPACITY; i++)
-    {
-        indexes[i]->c = 0;
-        indexes[i]->dirty = false;
-        indexes[i]->list = NULL;
-        indexes[i]->left = NULL;
-        indexes[i]->right = NULL;
-    }
-    for (int i = 1; i <= (MAX_CAPACITY - 1) / 2; i++)
-    {
-        indexes[i - 1]->left = indexes[(i * 2) - 1];
-        indexes[i - 1]->right = indexes[(i * 2)];
-    }
-}
 
 int randiom(int lower, int upper)
 {
@@ -82,7 +65,7 @@ int binary_search(int arr[], int left, int right, int x)
 int getMNodeValue(MNODE n)
 {
     if (n->c == 0)
-        return __INT_MAX__;
+        return INT_MAX;
     return n->list->value;
 }
 
@@ -122,6 +105,22 @@ void setMNodeDirty(MNODE n, bool newDirty)
     n->dirty = newDirty;
 }
 
+void intialiseMound(MOUND m)
+{
+    m->indexes = (MNODE*) malloc(sizeof(MNODE) * MAX_CAPACITY);
+    MNODE *indexes = m->indexes;
+    m->root = indexes[0];
+    for (int i = 0; i <= MAX_CAPACITY; i++)
+    {
+        indexes[i] = createNewMNode();
+    }
+    for (int i = 1; i <= (MAX_CAPACITY - 1) / 2; i++)
+    {
+        indexes[i - 1]->left = indexes[(i * 2) - 1];
+        indexes[i - 1]->right = indexes[(i * 2)];
+    }
+}
+
 void swapLeft(MNODE n)
 {
     LNODE temp = n->left->list;
@@ -153,26 +152,30 @@ void insert(MOUND m, int value)
     MNODE child = createNewMNode();
     MNODE parent = createNewMNode();
     int i = 0;
-    while (getMNodeValue(child) == __INT_MAX__ && i < THRESHOLD)
+    while (getMNodeValue(child) == INT_MAX && i < THRESHOLD)
     {
         unsigned int x = randiom((int)numberOfNodes, MAX_CAPACITY); // select randomly between numberOfNodes and MAX_CAPACITY
         unsigned int intitial = x;
         int intialPower = (int)log2(intitial);
         child = indexes[x];
         parent = indexes[x / 2];
-        while ((value <= getMNodeValue(child) && value > getMNodeValue(parent)) || x == 1)
+        while (!(value >= getMNodeValue(child) && value > getMNodeValue(parent)) && x != 1)
         {
             // binary search of x;
             int power = (int)log2(x);
             if (value <= getMNodeValue(child))
             {
                 power /= 2;
+                if(power == 0) power = 1;
                 int divideBy = pow(2, power);
                 x /= divideBy;
             }
             else
             {
-                power = power + (power / 2);
+                if(power / 2 == 0)
+                    power = power + 1;
+                else
+                    power = power + (power / 2);
                 int powerMult = intialPower - power;
                 int divideBy = pow(2, power);
                 x = intitial / divideBy;
@@ -187,6 +190,7 @@ void insert(MOUND m, int value)
         numberOfNodes++;
     temp->next = child->list;
     child->list = temp;
+    child->c += 1;
 }
 
 void moundify(MNODE n)
@@ -248,7 +252,7 @@ int main(int argc, char const *argv[])
     srand(time(0));
     MOUND M = createNewMound();
     intialiseMound(M);
-    // insert(M, 13);
-    // printMound(M);
+    insert(M, 13);
+    printMound(M);
     return 0;
 }
