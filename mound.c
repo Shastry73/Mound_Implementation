@@ -208,22 +208,6 @@ void moundify(MNODE n)
     moundify(n->right);
 }
 
-int extractMin(MOUND m)
-{
-    int min = getMNodeValue(m->root); // first element of the root node is the minimum
-    LNODE temp;
-    temp = m->root->list;
-    m->root->list = m->root->list->next;
-    free(temp);
-    int val = getMNodeValue(m->root);
-    int left = getMNodeValue(m->root->left);
-    int right = getMNodeValue(m->root->right);
-    if (val > left || val > right)
-        setMNodeDirty(m->root, true);
-    moundify(m->root);
-    return min;
-}
-
 void printLNodes(LNODE list)
 {
     LNODE temp = list;
@@ -247,6 +231,49 @@ void printInOrderMNode(MNODE n)
 void printMound(MOUND m)
 {
     printInOrderMNode(m->root);
+    printf("\n");
+}
+
+int extractMin(MOUND m)
+{
+    if (m->root->list == NULL)
+    {
+        printf("Mound empty");
+        return -1;
+    }
+    int min = getMNodeValue(m->root); // first element of the root node is the minimum
+    LNODE temp;
+    temp = m->root->list;
+    m->root->list = m->root->list->next;
+    m->root->c -= 1;
+    free(temp);
+    int val = getMNodeValue(m->root);
+    int left = getMNodeValue(m->root->left);
+    int right = getMNodeValue(m->root->right);
+    if (val > left || val > right)
+        setMNodeDirty(m->root, true);
+    moundify(m->root);
+    printMound(m);
+    return min;
+}
+
+void print2DUtil(MNODE n, int space)
+{
+    int i;
+    if (n->list == NULL)
+        return;
+    space += 5;
+    print2DUtil(n->right, space);
+    printf("\n");
+    for (i = 5; i < space; i++)
+        printf(" ");
+    printf("%d\n", getMNodeValue(n));
+    print2DUtil(n->left, space);
+}
+
+void print2D(MOUND m)
+{
+    print2DUtil(m->root, 0);
 }
 
 int main(int argc, char const *argv[])
@@ -256,12 +283,29 @@ int main(int argc, char const *argv[])
     intialiseMound(M);
     insert(M, 13);
     insert(M, 1);
-    insert(M, 1);
-    insert(M, 1);
+    insert(M, 2);
+    insert(M, 3);
     insert(M, 40);
-    insert(M, 50);
-    insert(M, 40);
-    insert(M, 50);
+    // insert(M, 50);
+    // insert(M, 10);
+    // insert(M, 2);
+    // insert(M, 3);
+    // insert(M, 40);
+    // insert(M, 50);
+    // insert(M, 10);
+    // insert(M, 20);
+    // insert(M, 2);
+    // insert(M, 3);
+    // insert(M, 40);
+    // insert(M, 50);
+    // insert(M, 10);
+    // insert(M, 20);
+    // insert(M, 20);
+
     printMound(M);
+    print2D(M);
+    // extractMin(M);
+    // print2D(M);
+
     return 0;
 }
