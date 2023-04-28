@@ -107,13 +107,13 @@ void setMNodeDirty(MNODE n, bool newDirty)
 
 void intialiseMound(MOUND m)
 {
-    m->indexes = (MNODE*) malloc(sizeof(MNODE) * MAX_CAPACITY);
+    m->indexes = (MNODE *)malloc(sizeof(MNODE) * MAX_CAPACITY);
     MNODE *indexes = m->indexes;
-    m->root = indexes[0];
     for (int i = 0; i <= MAX_CAPACITY; i++)
     {
         indexes[i] = createNewMNode();
     }
+    m->root = indexes[0];
     for (int i = 1; i <= (MAX_CAPACITY - 1) / 2; i++)
     {
         indexes[i - 1]->left = indexes[(i * 2) - 1];
@@ -149,16 +149,16 @@ void swapRight(MNODE n)
 void insert(MOUND m, int value)
 {
     MNODE *indexes = m->indexes;
-    MNODE child = createNewMNode();
-    MNODE parent = createNewMNode();
+    MNODE child;
+    MNODE parent;
     int i = 0;
-    while (getMNodeValue(child) == INT_MAX && i < THRESHOLD)
+    do
     {
         unsigned int x = randiom((int)numberOfNodes, MAX_CAPACITY); // select randomly between numberOfNodes and MAX_CAPACITY
         unsigned int intitial = x;
         int intialPower = (int)log2(intitial);
-        child = indexes[x];
-        parent = indexes[x / 2];
+        child = indexes[x - 1];
+        parent = indexes[(x / 2) - 1];
         while (!(value >= getMNodeValue(child) && value > getMNodeValue(parent)) && x != 1)
         {
             // binary search of x;
@@ -166,13 +166,14 @@ void insert(MOUND m, int value)
             if (value <= getMNodeValue(child))
             {
                 power /= 2;
-                if(power == 0) power = 1;
+                if (power == 0)
+                    power = 1;
                 int divideBy = pow(2, power);
                 x /= divideBy;
             }
             else
             {
-                if(power / 2 == 0)
+                if (power / 2 == 0)
                     power = power + 1;
                 else
                     power = power + (power / 2);
@@ -180,11 +181,12 @@ void insert(MOUND m, int value)
                 int divideBy = pow(2, power);
                 x = intitial / divideBy;
             }
-            child = indexes[x];
-            parent = indexes[x / 2];
+            child = indexes[x - 1];
+            if (x != 1)
+                parent = indexes[(x / 2) - 1];
         }
         i++;
-    }
+    } while (getMNodeValue(child) == INT_MAX && i < THRESHOLD);
     LNODE temp = createNewLNode(value);
     if (child->list == NULL)
         numberOfNodes++;
@@ -218,7 +220,7 @@ int extractMin(MOUND m)
     int right = getMNodeValue(m->root->right);
     if (val > left || val > right)
         setMNodeDirty(m->root, true);
-    moundify(m);
+    moundify(m->root);
     return min;
 }
 
@@ -235,10 +237,10 @@ void printLNodes(LNODE list)
 
 void printInOrderMNode(MNODE n)
 {
-    if (n == NULL)
+    if (n->list == NULL)
         return;
     printInOrderMNode(n->left);
-    printLNodes(n);
+    printLNodes(n->list);
     printInOrderMNode(n->right);
 }
 
