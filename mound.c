@@ -3,8 +3,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <math.h>
+#include <limits.h>
 #include <time.h>
-#define INT_MAX 2147483647
+// #define INT_MAX 2147483647
 #define MAX_CAPACITY 100
 #define THRESHOLD 1
 
@@ -148,6 +149,9 @@ void swapRight(MNODE n)
 
 void insert(MOUND m, int value)
 {
+    MNODE dummy = createNewMNode();
+    LNODE dummyData = createNewLNode(INT_MIN);
+    dummy->list = dummyData;
     MNODE *indexes = m->indexes;
     MNODE child;
     MNODE parent;
@@ -184,6 +188,10 @@ void insert(MOUND m, int value)
             child = indexes[x - 1];
             if (x != 1)
                 parent = indexes[(x / 2) - 1];
+            else
+            {
+                parent = dummy;
+            }
         } while (!(value <= getMNodeValue(child) && value > getMNodeValue(parent)) && x != 1);
         i++;
     } while (getMNodeValue(child) == INT_MAX && i < THRESHOLD);
@@ -193,6 +201,7 @@ void insert(MOUND m, int value)
     temp->next = child->list;
     child->list = temp;
     child->c += 1;
+    free(dummy);
 }
 
 void moundify(MNODE n)
@@ -274,6 +283,7 @@ void print2DUtil(MNODE n, int space)
 void print2D(MOUND m)
 {
     print2DUtil(m->root, 0);
+    printf("\n\n\n\n\n");
 }
 
 int main(int argc, char const *argv[])
@@ -282,25 +292,45 @@ int main(int argc, char const *argv[])
     MOUND M = createNewMound();
     intialiseMound(M);
     insert(M, 13);
+    print2D(M);
     insert(M, 1);
+    print2D(M);
     insert(M, 2);
+    print2D(M);
     insert(M, 3);
+    print2D(M);
     insert(M, 40);
-    // insert(M, 50);
-    // insert(M, 10);
-    // insert(M, 2);
-    // insert(M, 3);
-    // insert(M, 40);
-    // insert(M, 50);
-    // insert(M, 10);
-    // insert(M, 20);
-    // insert(M, 2);
-    // insert(M, 3);
-    // insert(M, 40);
-    // insert(M, 50);
-    // insert(M, 10);
-    // insert(M, 20);
-    // insert(M, 20);
+    print2D(M);
+    insert(M, 50);
+    print2D(M);
+    insert(M, 10);
+    print2D(M);
+    insert(M, 2);
+    print2D(M);
+    insert(M, 3);
+    print2D(M);
+    insert(M, 40);
+    print2D(M);
+    insert(M, 50);
+    print2D(M);
+    insert(M, 10);
+    print2D(M);
+    insert(M, 20);
+    print2D(M);
+    insert(M, 2);
+    print2D(M);
+    insert(M, 3);
+    print2D(M);
+    insert(M, 40);
+    print2D(M);
+    insert(M, 50);
+    print2D(M);
+    insert(M, 10);
+    print2D(M);
+    insert(M, 20);
+    print2D(M);
+    insert(M, 20);
+    print2D(M);
 
     printMound(M);
     print2D(M);
