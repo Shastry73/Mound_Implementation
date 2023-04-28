@@ -8,8 +8,6 @@
 #define MAX_CAPACITY 127
 #define THRESHOLD 1
 
-unsigned int numberOfNodes = 0;
-
 typedef struct LNode *LNODE;
 struct LNode
 {
@@ -30,6 +28,7 @@ struct mound
 {
     MNODE root;
     MNODE *indexes;
+    unsigned int numberOfNodes;
 };
 
 struct MNode defaultMNode = {0, false, NULL, NULL, NULL};
@@ -81,6 +80,7 @@ MOUND createNewMound()
 {
     MOUND m = (MOUND)malloc(sizeof(struct mound));
     m->root = NULL;
+    m->numberOfNodes = 0;
     return m;
 }
 
@@ -211,7 +211,7 @@ void insert(MOUND m, int value)
     } while (getMNodeValue(child) == INT_MAX && i < THRESHOLD);
     LNODE temp = createNewLNode(value);
     if (child->list == NULL)
-        numberOfNodes++;
+        m->numberOfNodes++;
     temp->next = child->list;
     child->list = temp;
     child->c += 1;
@@ -289,6 +289,8 @@ int extractMin(MOUND m)
     temp = m->root->list;
     m->root->list = m->root->list->next;
     m->root->c -= 1;
+    if (m->root->c == 0)
+        m->numberOfNodes -= 1;
     free(temp);
     int val = getMNodeValue(m->root);
     int left = getMNodeValue(m->root->left);
@@ -317,9 +319,12 @@ int main(int argc, char const *argv[])
     insert(M, 3);
     insert(M, 40);
 
-    // print2D(M);
+    print2D(M);
     // printMound(M);
-    extractMin(M);
+    // extractMin(M);
+    // extractMin(M);
+    // extractMin(M);
+    // extractMin(M);
 
     return 0;
 }
