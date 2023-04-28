@@ -154,12 +154,12 @@ void insert(MOUND m, int value)
     int i = 0;
     do
     {
-        unsigned int x = randiom((int)numberOfNodes, MAX_CAPACITY); // select randomly between numberOfNodes and MAX_CAPACITY
+        unsigned int x = randiom((int)numberOfNodes + 1, MAX_CAPACITY); // select randomly between numberOfNodes and MAX_CAPACITY
         unsigned int intitial = x;
         int intialPower = (int)log2(intitial);
         child = indexes[x - 1];
         parent = indexes[(x / 2) - 1];
-        while (!(value >= getMNodeValue(child) && value > getMNodeValue(parent)) && x != 1)
+        do
         {
             // binary search of x;
             int power = (int)log2(x);
@@ -184,7 +184,7 @@ void insert(MOUND m, int value)
             child = indexes[x - 1];
             if (x != 1)
                 parent = indexes[(x / 2) - 1];
-        }
+        } while (!(value <= getMNodeValue(child) && value > getMNodeValue(parent)) && x != 1);
         i++;
     } while (getMNodeValue(child) == INT_MAX && i < THRESHOLD);
     LNODE temp = createNewLNode(value);
@@ -255,6 +255,13 @@ int main(int argc, char const *argv[])
     MOUND M = createNewMound();
     intialiseMound(M);
     insert(M, 13);
+    insert(M, 1);
+    insert(M, 1);
+    insert(M, 1);
+    insert(M, 40);
+    insert(M, 50);
+    insert(M, 40);
+    insert(M, 50);
     printMound(M);
     return 0;
 }
