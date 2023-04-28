@@ -39,6 +39,14 @@ int randiom(int lower, int upper)
     int num = (rand() % (upper - lower + 1)) + lower;
     return num;
 }
+bool isPowerOf2(int n)
+{
+    if (n <= 0)
+    {
+        return false;
+    }
+    return (n & (n - 1)) == 0;
+}
 
 int binary_search(int arr[], int left, int right, int x)
 {
@@ -178,8 +186,15 @@ void insert(MOUND m, int value)
             {
                 if (power / 2 == 0)
                     power = power + 1;
+                else if (power % 2 == 0)
+                {
+                    power = power + ((power - 1) / 2);
+                }
                 else
+                {
                     power = power + (power / 2);
+                }
+                // if (isPowerOf2(x)) power
                 int powerMult = intialPower - power;
                 int divideBy = pow(2, powerMult);
                 x = intitial / divideBy;
@@ -191,7 +206,7 @@ void insert(MOUND m, int value)
             {
                 parent = dummy;
             }
-        } while (!(value <= getMNodeValue(child) && (value > getMNodeValue(parent)) || (value = getMNodeValue(parent))) && x != 1);
+        } while (!((value <= getMNodeValue(child)) && ((value > getMNodeValue(parent)))) && x != 1);
         i++;
     } while (getMNodeValue(child) == INT_MAX && i < THRESHOLD);
     LNODE temp = createNewLNode(value);
@@ -242,29 +257,6 @@ void printMound(MOUND m)
     printf("\n");
 }
 
-int extractMin(MOUND m)
-{
-    if (m->root->list == NULL)
-    {
-        printf("Mound empty");
-        return -1;
-    }
-    int min = getMNodeValue(m->root); // first element of the root node is the minimum
-    LNODE temp;
-    temp = m->root->list;
-    m->root->list = m->root->list->next;
-    m->root->c -= 1;
-    free(temp);
-    int val = getMNodeValue(m->root);
-    int left = getMNodeValue(m->root->left);
-    int right = getMNodeValue(m->root->right);
-    if (val > left || val > right)
-        setMNodeDirty(m->root, true);
-    moundify(m->root);
-    printMound(m);
-    return min;
-}
-
 void print2DUtil(MNODE n, int space)
 {
     int i;
@@ -285,6 +277,30 @@ void print2D(MOUND m)
     printf("\n\n\n\n\n");
 }
 
+int extractMin(MOUND m)
+{
+    if (m->root->list == NULL)
+    {
+        printf("Mound empty");
+        return -1;
+    }
+    int min = getMNodeValue(m->root); // first element of the root node is the minimum
+    LNODE temp;
+    temp = m->root->list;
+    m->root->list = m->root->list->next;
+    m->root->c -= 1;
+    free(temp);
+    int val = getMNodeValue(m->root);
+    int left = getMNodeValue(m->root->left);
+    int right = getMNodeValue(m->root->right);
+    if (val > left || val > right)
+        setMNodeDirty(m->root, true);
+    moundify(m->root);
+    printMound(m);
+    print2D(m);
+    return min;
+}
+
 int main(int argc, char const *argv[])
 {
     srand(time(0));
@@ -300,11 +316,10 @@ int main(int argc, char const *argv[])
     insert(M, 2);
     insert(M, 3);
     insert(M, 40);
-    insert(M, 50);
-    insert(M, 10);
-    insert(M, 20);
 
     // print2D(M);
+    // printMound(M);
+    extractMin(M);
 
     return 0;
 }
