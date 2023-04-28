@@ -5,7 +5,6 @@
 #include <math.h>
 #include <limits.h>
 #include <time.h>
-// #define INT_MAX 2147483647
 #define MAX_CAPACITY 100
 #define THRESHOLD 1
 
