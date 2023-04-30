@@ -131,9 +131,12 @@ void intialiseMound(MOUND m)
 
 void swapLeft(MNODE n)
 {
+    int leftc = n->left->c;
     LNODE temp = n->left->list;
     n->left->list = n->list;
     n->list = temp;
+    n->left->c = n->c;
+    n->c = leftc;
     setMNodeDirty(n, false);
     int val = getMNodeValue(n->left);
     int left = getMNodeValue(n->left->left);
@@ -143,9 +146,12 @@ void swapLeft(MNODE n)
 }
 void swapRight(MNODE n)
 {
+    int rightc = n->right->c;
     LNODE temp = n->right->list;
     n->right->list = n->list;
     n->list = temp;
+    n->right->c = n->c;
+    n->c = rightc;
     setMNodeDirty(n, false);
     int val = getMNodeValue(n->right);
     int left = getMNodeValue(n->right->left);
@@ -281,7 +287,7 @@ int extractMin(MOUND m)
 {
     if (m->root->list == NULL)
     {
-        printf("Mound empty");
+        printf("Mound empty\n");
         return -1;
     }
     int min = getMNodeValue(m->root); // first element of the root node is the minimum
@@ -299,7 +305,7 @@ int extractMin(MOUND m)
         setMNodeDirty(m->root, true);
     moundify(m->root);
     printMound(m);
-    print2D(m);
+    // print2D(m);
     return min;
 }
 
@@ -308,23 +314,8 @@ int main(int argc, char const *argv[])
     srand(time(0));
     MOUND M = createNewMound();
     intialiseMound(M);
-    insert(M, 13);
-    insert(M, 1);
-    insert(M, 2);
-    insert(M, 3);
-    insert(M, 40);
-    insert(M, 50);
-    insert(M, 10);
-    insert(M, 2);
-    insert(M, 3);
-    insert(M, 40);
 
-    print2D(M);
-    // printMound(M);
-    // extractMin(M);
-    // extractMin(M);
-    // extractMin(M);
-    // extractMin(M);
+    // handle the file, call the insert function to insert and extractMin to extract the minimum.
 
     return 0;
 }
