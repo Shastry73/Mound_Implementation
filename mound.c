@@ -291,6 +291,7 @@ int extractMin(MOUND m)
         return -1;
     }
     int min = getMNodeValue(m->root); // first element of the root node is the minimum
+    printf("Minimum element: %d\n\n", min);
     LNODE temp;
     temp = m->root->list;
     m->root->list = m->root->list->next;
@@ -304,7 +305,7 @@ int extractMin(MOUND m)
     if (val > left || val > right)
         setMNodeDirty(m->root, true);
     moundify(m->root);
-    printMound(m);
+    // printMound(m);
     // print2D(m);
     return min;
 }
@@ -312,10 +313,21 @@ int extractMin(MOUND m)
 int main(int argc, char const *argv[])
 {
     srand(time(0));
-    MOUND M = createNewMound();
-    intialiseMound(M);
-
-    // handle the file, call the insert function to insert and extractMin to extract the minimum.
+    MOUND m = createNewMound();
+    intialiseMound(m);
+    printMound(m);
+        FILE *fp;
+    int number;
+    fp = fopen("data.txt", "r");
+    if (fp == NULL) {
+        printf("Error opening the file.\n");
+        return 1;
+    }
+    while (fscanf(fp, "%d", &number) != EOF) {
+        insert(m, number);
+    }
+    fclose(fp);
+    extractMin(m);  
 
     return 0;
 }
