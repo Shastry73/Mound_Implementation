@@ -316,18 +316,25 @@ int main(int argc, char const *argv[])
     MOUND m = createNewMound();
     intialiseMound(m);
     printMound(m);
-        FILE *fp;
+    FILE *fp;
     int number;
     fp = fopen("data.txt", "r");
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
         printf("Error opening the file.\n");
         return 1;
     }
-    while (fscanf(fp, "%d", &number) != EOF) {
+    while (fscanf(fp, "%d", &number) != EOF)
+    {
         insert(m, number);
     }
     fclose(fp);
-    extractMin(m);  
+    print2D(m);
+    int t;
+    do
+    {
+        t = extractMin(m);
+    } while (t != -1);
 
     return 0;
 }
