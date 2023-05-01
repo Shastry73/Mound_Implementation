@@ -43,35 +43,35 @@ int randiom(int lower, int upper)
     int num = (rand() % (upper - lower + 1)) + lower;
     return num;
 }
-bool isPowerOf2(int n)
-{
-    if (n <= 0)
-    {
-        return false;
-    }
-    return (n & (n - 1)) == 0;
-}
+// bool isPowerOf2(int n)
+// {
+//     if (n <= 0)
+//     {
+//         return false;
+//     }
+//     return (n & (n - 1)) == 0;
+// }
 
-int binary_search(int arr[], int left, int right, int x)
-{
-    while (left <= right)
-    {
-        int mid = left + (right - left) / 2;
-        if (arr[mid] == x)
-        {
-            return mid;
-        }
-        else if (arr[mid] < x)
-        {
-            left = mid + 1;
-        }
-        else
-        {
-            right = mid - 1;
-        }
-    }
-    return -1;
-}
+// int binary_search(int arr[], int left, int right, int x)
+// {
+//     while (left <= right)
+//     {
+//         int mid = left + (right - left) / 2;
+//         if (arr[mid] == x)
+//         {
+//             return mid;
+//         }
+//         else if (arr[mid] < x)
+//         {
+//             left = mid + 1;
+//         }
+//         else
+//         {
+//             right = mid - 1;
+//         }
+//     }
+//     return -1;
+// }
 
 // returns the MNode value
 int getMNodeValue(MNODE n)
@@ -321,10 +321,10 @@ int main(int argc, char const *argv[])
     MOUND m = createNewMound();
     intialiseMound(m);
     // printMound(m);
-    printf("initialised\n");
+    // printf("initialised\n");
     FILE *fp;
     int number;
-    fp = fopen("bigData.txt", "r");
+    fp = fopen("data.txt", "r");
     if (fp == NULL)
     {
         printf("Error opening the file.\n");
@@ -332,7 +332,7 @@ int main(int argc, char const *argv[])
     }
     while (fscanf(fp, "%d", &number) != EOF)
     {
-        printf("%d\n", number);
+        // printf("%d\n", number);
         insert(m, number);
     }
     fclose(fp);
