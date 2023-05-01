@@ -5,8 +5,13 @@
 #include <math.h>
 #include <limits.h>
 #include <time.h>
-#define MAX_CAPACITY 127
+#define MAX_CAPACITY 131071
 #define THRESHOLD 1
+
+int alog(int x)
+{
+    return 32 - __builtin_clz(x) - 1;
+}
 
 typedef struct LNode *LNODE;
 struct LNode
@@ -172,38 +177,40 @@ void insert(MOUND m, int value)
     do
     {
         unsigned int x = randiom((MAX_CAPACITY + 1) / 2, MAX_CAPACITY); // select randomly between numberOfNodes and MAX_CAPACITY
-        unsigned int intitial = x;
-        int intialPower = (int)log2(intitial);
+        unsigned int big = x;
+        int bigPower = alog(big);
+        unsigned int small = 1;
+        int smallPower = alog(small);
         child = indexes[x - 1];
         parent = indexes[(x / 2) - 1];
         do
         {
             // binary search of x;
-            int power = (int)log2(x);
+            int power = alog(x);
             if (value <= getMNodeValue(child))
             {
-                power /= 2;
-                if (power == 0)
-                    power = 1;
-                int divideBy = pow(2, power);
+                big = x;
+                bigPower = alog(big);
+                power = (smallPower + power) / 2;
+                // if (power == 0)
+                //     power = 1;
+                int toMinus = bigPower - power;
+                int divideBy = pow(2, toMinus);
                 x /= divideBy;
             }
             else
             {
-                if (power / 2 == 0)
-                    power = power + 1;
-                else if (power % 2 == 0)
-                {
-                    power = power + ((power - 1) / 2);
-                }
-                else
-                {
-                    power = power + (power / 2);
-                }
+                small = x;
+                smallPower = alog(small);
+                power = (bigPower + power) / 2;
+                int toMinus = bigPower - power;
+                int divideBy = pow(2, toMinus);
+                x /= divideBy;
                 // if (isPowerOf2(x)) power
-                int powerMult = intialPower - power;
-                int divideBy = pow(2, powerMult);
-                x = intitial / divideBy;
+            }
+            if (x == 0)
+            {
+                x = 1;
             }
             child = indexes[x - 1];
             if (x != 1)
@@ -315,10 +322,11 @@ int main(int argc, char const *argv[])
     srand(time(0));
     MOUND m = createNewMound();
     intialiseMound(m);
-    printMound(m);
+    // printMound(m);
+    printf("initialised\n");
     FILE *fp;
     int number;
-    fp = fopen("data.txt", "r");
+    fp = fopen("bigData.txt", "r");
     if (fp == NULL)
     {
         printf("Error opening the file.\n");
@@ -326,6 +334,7 @@ int main(int argc, char const *argv[])
     }
     while (fscanf(fp, "%d", &number) != EOF)
     {
+        printf("%d\n", number);
         insert(m, number);
     }
     fclose(fp);
