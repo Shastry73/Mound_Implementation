@@ -5,8 +5,8 @@
 #include <math.h>
 #include <limits.h>
 #include <time.h>
-#define MAX_CAPACITY 131071
-#define THRESHOLD 1
+#define MAX_CAPACITY 4194303 // 2^22 - 1
+#define THRESHOLD 10
 
 int alog(int x)
 {
@@ -191,9 +191,7 @@ void insert(MOUND m, int value)
             {
                 big = x;
                 bigPower = alog(big);
-                power = (smallPower + power) / 2;
-                // if (power == 0)
-                //     power = 1;
+                power = (smallPower + bigPower) / 2;
                 int toMinus = bigPower - power;
                 int divideBy = pow(2, toMinus);
                 x /= divideBy;
@@ -201,11 +199,11 @@ void insert(MOUND m, int value)
             else
             {
                 small = x;
-                smallPower = alog(small);
-                power = (bigPower + power) / 2;
-                int toMinus = bigPower - power;
-                int divideBy = pow(2, toMinus);
-                x /= divideBy;
+                smallPower = alog(small) + 1;
+                power = (bigPower + smallPower) / 2;
+                int toAdd = bigPower - power;
+                int divideBy = pow(2, toAdd);
+                x = big / divideBy;
                 // if (isPowerOf2(x)) power
             }
             if (x == 0)
@@ -219,7 +217,7 @@ void insert(MOUND m, int value)
             {
                 parent = dummy;
             }
-        } while (!((value <= getMNodeValue(child)) && ((value > getMNodeValue(parent)))) && x != 1);
+        } while (!((value <= getMNodeValue(child)) && ((value > getMNodeValue(parent)))) && x != 1 && bigPower > smallPower);
         i++;
     } while (getMNodeValue(child) == INT_MAX && i < THRESHOLD);
     LNODE temp = createNewLNode(value);
@@ -338,7 +336,7 @@ int main(int argc, char const *argv[])
         insert(m, number);
     }
     fclose(fp);
-    print2D(m);
+    // print2D(m);
     int t;
     do
     {
