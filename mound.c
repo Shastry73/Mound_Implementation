@@ -8,17 +8,21 @@
 #define MAX_CAPACITY 4194303 // 2^22 - 1
 #define THRESHOLD 10
 
+// Efficient function to find powers of 2
 int alog(int x)
 {
     return 32 - __builtin_clz(x) - 1;
 }
 
+// List's node structure definition and pointer declaration
 typedef struct LNode *LNODE;
 struct LNode
 {
     int value;
     LNODE next;
 };
+
+// Mound's node structure definition and pointer declaration
 typedef struct MNode *MNODE;
 struct MNode
 {
@@ -28,6 +32,8 @@ struct MNode
     MNODE left;
     MNODE right;
 };
+
+// Mounds' structure definition and pointer declaration
 typedef struct mound *MOUND;
 struct mound
 {
@@ -38,11 +44,14 @@ struct mound
 
 struct MNode defaultMNode = {0, false, NULL, NULL, NULL};
 
+//Function defined to return random integer between the range
 int randiom(int lower, int upper)
 {
     int num = (rand() % (upper - lower + 1)) + lower;
     return num;
 }
+
+
 // bool isPowerOf2(int n)
 // {
 //     if (n <= 0)
@@ -73,7 +82,8 @@ int randiom(int lower, int upper)
 //     return -1;
 // }
 
-// returns the MNode value
+
+// Returns the Mound Node's value
 int getMNodeValue(MNODE n)
 {
     if (n->c == 0)
@@ -81,6 +91,7 @@ int getMNodeValue(MNODE n)
     return n->list->value;
 }
 
+// Function to create a whole new Mound structure
 MOUND createNewMound()
 {
     MOUND m = (MOUND)malloc(sizeof(struct mound));
@@ -89,6 +100,7 @@ MOUND createNewMound()
     return m;
 }
 
+// Function to create a single new node in the Mound
 MNODE createNewMNode()
 {
     MNODE n = (MNODE)malloc(sizeof(struct MNode));
@@ -96,48 +108,56 @@ MNODE createNewMNode()
     n->dirty = false;
     n->list = NULL;
     n->left = NULL;
-    n->right = NULL;
+    n->right = NULL;     //initialisation of MNode
     return n;
 }
 
+
+// Function to create a single new node in the List
 LNODE createNewLNode(int val)
 {
     LNODE l = (LNODE)malloc(sizeof(struct LNode));
     l->next = NULL;
-    l->value = val;
+    l->value = val;       //initialisation of LNode
     return l;
 }
 
+// Checks if Mound's node is dirty or not
 bool checkDirty(MNODE n)
 {
     return n->dirty;
 }
 
+// Function used to set Mound's node dirty if the child parent condition of mound is not satisfied
 void setMNodeDirty(MNODE n, bool newDirty)
 {
     n->dirty = newDirty;
 }
 
+
+// TO initialise mound data structure with memory allocation and tree formation using indices
 void intialiseMound(MOUND m)
 {
     m->indexes = (MNODE *)malloc(sizeof(MNODE) * MAX_CAPACITY);
     MNODE *indexes = m->indexes;
     for (int i = 0; i <= MAX_CAPACITY; i++)
     {
-        indexes[i] = createNewMNode();
+        indexes[i] = createNewMNode();   // initialising MNodes for every every node
     }
     m->root = indexes[0];
     for (int i = 1; i <= (MAX_CAPACITY - 1) / 2; i++)
     {
-        indexes[i - 1]->left = indexes[(i * 2) - 1];
-        indexes[i - 1]->right = indexes[(i * 2)];
+        indexes[i - 1]->left = indexes[(i * 2) - 1];     // to create relations of left
+        indexes[i - 1]->right = indexes[(i * 2)];        //   and right child to parent node using indexes
     }
 }
 
+
+// Function used to swap parent node with left child using pointers swapping
 void swapLeft(MNODE n)
 {
     int leftc = n->left->c;
-    LNODE temp = n->left->list;
+    LNODE temp = n->left->list;        // creating a temporary list node to exchange list pointers
     n->left->list = n->list;
     n->list = temp;
     n->left->c = n->c;
@@ -147,8 +167,10 @@ void swapLeft(MNODE n)
     int left = getMNodeValue(n->left->left);
     int right = getMNodeValue(n->left->right);
     if (val > left || val > right)
-        setMNodeDirty(n->left, true);
+        setMNodeDirty(n->left, true);    // setting new parent node dirty if value greater than any child
 }
+
+// Same function for right child as was for left child above
 void swapRight(MNODE n)
 {
     int rightc = n->right->c;
@@ -229,16 +251,18 @@ void insert(MOUND m, int value)
     free(dummy);
 }
 
+// Corrects the mound structure when disturbed
 void moundify(MNODE n)
 {
     if (!checkDirty(n))
         return;
 
-    moundify(n->left);
-    moundify(n->right);
+    moundify(n->left);      // recursive call to check each and 
+    moundify(n->right);     //    every node and swap it with correct positions
 
     (getMNodeValue(n->left) > getMNodeValue(n->right)) ? swapRight(n) : swapLeft(n);
-    moundify(n->left);
+
+    moundify(n->left);      // recursive call to check each and every node and swap it with correct positions
     moundify(n->right);
 }
 
