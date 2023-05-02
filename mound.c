@@ -251,7 +251,7 @@ void insert(MOUND m, int value)
     free(dummy);
 }
 
-// Corrects the mound structure when disturbed
+// Corrects the mound structure when disturbed and dirty nodes are present
 void moundify(MNODE n)
 {
     if (!checkDirty(n))
@@ -262,10 +262,11 @@ void moundify(MNODE n)
 
     (getMNodeValue(n->left) > getMNodeValue(n->right)) ? swapRight(n) : swapLeft(n);
 
-    moundify(n->left);      // recursive call to check each and every node and swap it with correct positions
-    moundify(n->right);
+    moundify(n->left);      // recursive call to check each and 
+    moundify(n->right);     //    every node and swap it with correct positions
 }
 
+// To print list of any list node
 void printLNodes(LNODE list)
 {
     LNODE temp = list;
@@ -277,21 +278,24 @@ void printLNodes(LNODE list)
     printf("\n");
 }
 
+// In-order traversal of the mound nodes and printing them in order
 void printInOrderMNode(MNODE n)
 {
     if (n->list == NULL)
         return;
-    printInOrderMNode(n->left);
+    printInOrderMNode(n->left);    // recursive call for left branch
     printLNodes(n->list);
-    printInOrderMNode(n->right);
+    printInOrderMNode(n->right);   // recursive call for right branch
 }
 
+// To print every node of the mound structure
 void printMound(MOUND m)
 {
     printInOrderMNode(m->root);
     printf("\n");
 }
 
+// Prints the first head value of all lists in 2D
 void print2DUtil(MNODE n, int space)
 {
     int i;
@@ -306,12 +310,14 @@ void print2DUtil(MNODE n, int space)
     print2DUtil(n->left, space);
 }
 
+// Prints the whole mound structure in 2D using print2DUtil function
 void print2D(MOUND m)
 {
     print2DUtil(m->root, 0);
     printf("\n\n\n\n\n");
 }
 
+// Extracts and prints the root node value of the mound and then moundify to maintain the mound properties
 int extractMin(MOUND m)
 {
     if (m->root->list == NULL)
@@ -319,20 +325,20 @@ int extractMin(MOUND m)
         printf("Mound empty\n");
         return -1;
     }
-    int min = getMNodeValue(m->root); // first element of the root node is the minimum
+    int min = getMNodeValue(m->root);       // first element of the root node is the minimum
     printf("Minimum element: %d\n\n", min);
-    LNODE temp;
-    temp = m->root->list;
+    LNODE temp;                             // temporary list node created to remove the root node 
+    temp = m->root->list;                   //      and its corresponding list
     m->root->list = m->root->list->next;
     m->root->c -= 1;
     if (m->root->c == 0)
         m->numberOfNodes -= 1;
-    free(temp);
+    free(temp);                             // node memory is now free and root node has been removed
     int val = getMNodeValue(m->root);
     int left = getMNodeValue(m->root->left);
     int right = getMNodeValue(m->root->right);
     if (val > left || val > right)
-        setMNodeDirty(m->root, true);
+        setMNodeDirty(m->root, true);       // setting node dirty based on child node conditions
     moundify(m->root);
     // printMound(m);
     // print2D(m);
@@ -343,7 +349,7 @@ int main(int argc, char const *argv[])
 {
     srand(time(0));
     MOUND m = createNewMound();
-    intialiseMound(m);
+    intialiseMound(m);                  // Initialising mound with maximum size
     // printMound(m);
     // printf("initialised\n");
     FILE *fp;
@@ -357,14 +363,14 @@ int main(int argc, char const *argv[])
     while (fscanf(fp, "%d", &number) != EOF)
     {
         // printf("%d\n", number);
-        insert(m, number);
+        insert(m, number);                  // Insert function used to fill in the mound structure
     }
     fclose(fp);
     // print2D(m);
     int t;
     do
     {
-        t = extractMin(m);
+        t = extractMin(m);              // Root node printed until the mound is exhausted
     } while (t != -1);
 
     return 0;
