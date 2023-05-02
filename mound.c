@@ -187,16 +187,18 @@ void swapRight(MNODE n)
         setMNodeDirty(n->right, true);
 }
 
+
+// Insert function takes in mound structure and value to be inserted
 void insert(MOUND m, int value)
 {
     MNODE dummy = createNewMNode();
-    LNODE dummyData = createNewLNode(INT_MIN);
+    LNODE dummyData = createNewLNode(INT_MIN);   // dummy node created to be inserted in mound
     dummy->list = dummyData;
     MNODE *indexes = m->indexes;
     MNODE child;
     MNODE parent;
     int i = 0;
-    do
+    do    // loop to randomly selecting a leaf iterating THRESHOLD times to find correct branch if possible
     {
         unsigned int x = randiom((MAX_CAPACITY + 1) / 2, MAX_CAPACITY); // select randomly between numberOfNodes and MAX_CAPACITY
         unsigned int big = x;
@@ -205,11 +207,11 @@ void insert(MOUND m, int value)
         int smallPower = alog(small);
         child = indexes[x - 1];
         parent = indexes[(x / 2) - 1];
-        do
+        do                              // loop to search the correct position to insert in the randomly selected leaf branch
         {
-            // binary search of x;
+            // binary search of x
             int power = alog(x);
-            if (value <= getMNodeValue(child))
+            if (value <= getMNodeValue(child))   // to check if this position satisfies the condition of mound structure
             {
                 big = x;
                 bigPower = alog(big);
@@ -237,7 +239,7 @@ void insert(MOUND m, int value)
                 parent = indexes[(x / 2) - 1];
             else
             {
-                parent = dummy;
+                parent = dummy;     
             }
         } while (!((value <= getMNodeValue(child)) && ((value > getMNodeValue(parent)))) && x != 1 && bigPower > smallPower);
         i++;
@@ -248,7 +250,7 @@ void insert(MOUND m, int value)
     temp->next = child->list;
     child->list = temp;
     child->c += 1;
-    free(dummy);
+    free(dummy);  // free node memory after inserting properly in the mound
 }
 
 // Corrects the mound structure when disturbed and dirty nodes are present
